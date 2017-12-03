@@ -47,4 +47,12 @@ func TestLoadRangeData(t *testing.T) {
 		t.Errorf("HasRangeData() == %t, want %t", got, want)
 	}
 
+	// Ensure that unloading also works
+	want = true
+	got, err = UnloadRangeData()
+	if err != nil {
+		t.Errorf("UnloadRangeData() == %t, want %t (%q)", got, want, err)
+	} else if got != want {
+		t.Errorf("UnloadRangeData() == %t, want %t", got, want)
+	}
 }

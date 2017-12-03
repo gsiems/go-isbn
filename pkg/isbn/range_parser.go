@@ -2,6 +2,7 @@ package isbn
 
 import (
 	"encoding/xml"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -91,6 +92,23 @@ func HasRangeData() bool {
 	return false
 }
 
+// UnloadRangeData unloads any loaded RangeMessage.xml file data.
+// Probably not needed for production code; it is intended for testing
+// purposes.
+func UnloadRangeData() (bool, error) {
+
+	rmd = make(rangeData)
+
+	// Yeah, yeah. Like this is going to break in it's current form.
+	// Mostly here bor the sake of consistent interface and in case
+	// UnloadRangeData ever needs to do anything more complex that
+	// could break (won't need to rebuild anything using this pkg)
+	if len(rmd) > 0 {
+		return false, errors.New("Range data did not unload.")
+	}
+	return true, nil
+}
+
 // LoadRangeData loads a RangeMessage.xml file for use in parsing and
 // validating ISBNs. While this file does not appear to change often
 // it does still change and twould be a shame to have to re-compile
@@ -114,7 +132,10 @@ func LoadRangeData(filename string) (bool, error) {
 
 	// Just in case the data has already been loaded once, or there is
 	// a need to re-load the data.
-	rmd = make(rangeData)
+	_, err = UnloadRangeData()
+	if err != nil {
+		return false, err
+	}
 
 	for _, rg := range doc.RegistrationGroups.Group {
 		tokens := strings.Split(rg.Prefix.Text, "-")
