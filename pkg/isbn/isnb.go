@@ -42,7 +42,7 @@ func chkLength(isbn string) (bool, error) {
 	return true, nil
 }
 
-// chkCharacters checks that the characters in the ISBN are all valid
+// chkCharacters checks that the characters in the ISBN are all valid.
 func chkCharacters(isbn string) (bool, error) {
 	mainDigits := isbn[:len(isbn)-1]
 	checkDigit := isbn[len(isbn)-1:]
@@ -66,7 +66,7 @@ func chkCharacters(isbn string) (bool, error) {
 	return true, nil
 }
 
-// chkCheckDigit checks that the check digit for the ISBN is correct
+// chkCheckDigit checks that the check digit for the ISBN is correct.
 func chkCheckDigit(isbn string) (bool, error) {
 	checkDigit := isbn[len(isbn)-1:]
 
@@ -80,7 +80,7 @@ func chkCheckDigit(isbn string) (bool, error) {
 	return true, nil
 }
 
-// calcCheckDigit calculates the check digit for the ISBN
+// calcCheckDigit calculates the check digit for the ISBN.
 func calcCheckDigit(isbn string) (string, error) {
 	if len(isbn) == 10 {
 		return calcCheckDigit10(isbn)
@@ -90,7 +90,7 @@ func calcCheckDigit(isbn string) (string, error) {
 	return "", errors.New("Unable to calculate check digit, ISBN is wrong length.")
 }
 
-// calcCheckDigit10 calculates the check digit for an ISBN-10
+// calcCheckDigit10 calculates the check digit for an ISBN-10.
 func calcCheckDigit10(isbn string) (string, error) {
 
 	var cd string
@@ -115,7 +115,7 @@ func calcCheckDigit10(isbn string) (string, error) {
 
 }
 
-// calcCheckDigit10 calculates the check digit for an ISBN-13
+// calcCheckDigit10 calculates the check digit for an ISBN-13.
 func calcCheckDigit13(isbn string) (string, error) {
 
 	var cd string
@@ -271,7 +271,25 @@ func ParseISBN(isbn string) (ISBN, error) {
 	return ret, nil
 }
 
+// ISBN13 returns the ISBN as an ISBN-13.
+func (x ISBN) ISBN13() string {
+	if x.IsValid {
+		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
+		return strings.Join(s13, "")
+	}
+	return ""
+}
 
+// ISBN10 returns the ISBN as an ISBN-10 (as applicable).
+func (x ISBN) ISBN10() string {
+	if x.Prefix == "978" {
+		s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
+		return strings.Join(s10, "")
+	}
+	return ""
+}
+
+// String implements the Stringer interface. Format currently subject to change.
 func (x ISBN) String() string {
 	if x.IsValid {
 		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
