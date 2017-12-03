@@ -112,6 +112,10 @@ func LoadRangeData(filename string) (bool, error) {
 		return false, err
 	}
 
+	// Just in case the data has already been loaded once, or there is
+	// a need to re-load the data.
+	rmd = make(rangeData)
+
 	for _, rg := range doc.RegistrationGroups.Group {
 		tokens := strings.Split(rg.Prefix.Text, "-")
 		prefix := tokens[0]
