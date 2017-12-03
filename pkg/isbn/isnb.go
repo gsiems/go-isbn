@@ -270,3 +270,18 @@ func ParseISBN(isbn string) (ISBN, error) {
 
 	return ret, nil
 }
+
+
+func (x ISBN) String() string {
+	if x.IsValid {
+		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
+		out := strings.Join(s13, "-")
+
+		if x.Prefix == "978" {
+			s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
+			out = out + " (" + strings.Join(s10, "-") + ")"
+		}
+		return out
+	}
+	return ""
+}
