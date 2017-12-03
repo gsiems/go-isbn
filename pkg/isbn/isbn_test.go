@@ -77,10 +77,7 @@ func TestISBN(t *testing.T) {
 		if got != p.want {
 			t.Errorf("Print() == %q, want %q", got, p.want)
 		}
-
 	}
-
-	//		{"978-8804473282", true},
 
 	_, _ = UnloadRangeData()
 }
