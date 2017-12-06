@@ -93,15 +93,15 @@ func chkCheckDigit(isbn string) (bool, error) {
 // CalcCheckDigit calculates the check digit for the ISBN.
 func CalcCheckDigit(isbn string) (string, error) {
 	if len(isbn) == 10 {
-		return calcCheckDigit10(isbn)
+		return CalcCheckDigit10(isbn)
 	} else if len(isbn) == 13 {
-		return calcCheckDigit13(isbn)
+		return CalcCheckDigit13(isbn)
 	}
 	return "", errors.New("Unable to calculate check digit, ISBN is wrong length.")
 }
 
-// calcCheckDigit10 calculates the check digit for an ISBN-10.
-func calcCheckDigit10(isbn string) (string, error) {
+// CalcCheckDigit10 calculates the check digit for an ISBN-10.
+func CalcCheckDigit10(isbn string) (string, error) {
 
 	var cd string
 
@@ -122,11 +122,10 @@ func calcCheckDigit10(isbn string) (string, error) {
 	}
 
 	return cd, nil
-
 }
 
-// calcCheckDigit10 calculates the check digit for an ISBN-13.
-func calcCheckDigit13(isbn string) (string, error) {
+// CalcCheckDigit10 calculates the check digit for an ISBN-13.
+func CalcCheckDigit13(isbn string) (string, error) {
 
 	var cd string
 	var sum int32 = 0
@@ -259,22 +258,22 @@ func ParseISBN(isbn string) (ISBN, error) {
 	// Check the check digit
 	if len(isbn) == 10 {
 		ret.CheckDigit10 = isbn[len(isbn)-1:]
-		chk, _ := calcCheckDigit10(isbn)
+		chk, _ := CalcCheckDigit10(isbn)
 		ret.IsValid = ret.CheckDigit10 == chk
 
 		// calculate the check digit for ISBN-13
 		if ret.IsValid {
-			ret.CheckDigit13, _ = calcCheckDigit13("978" + isbn)
+			ret.CheckDigit13, _ = CalcCheckDigit13("978" + isbn)
 		}
 	} else if len(isbn) == 13 {
 		ret.CheckDigit13 = isbn[len(isbn)-1:]
-		chk, _ := calcCheckDigit13(isbn)
+		chk, _ := CalcCheckDigit13(isbn)
 		ret.IsValid = ret.CheckDigit13 == chk
 
 		// calculate the check digit for ISBN-10 if applicable
 		if ret.IsValid && ret.Prefix == "978" {
 			s := []string{ret.RegistrationGroup, ret.Registrant, ret.Publication, "X"}
-			ret.CheckDigit10, _ = calcCheckDigit10(strings.Join(s, ""))
+			ret.CheckDigit10, _ = CalcCheckDigit10(strings.Join(s, ""))
 		}
 	}
 
