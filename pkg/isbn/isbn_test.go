@@ -12,6 +12,34 @@ import (
 
 func TestISBN(t *testing.T) {
 
+	// Test the ISBN parsing/validation without range data
+	cases0 := []struct {
+		in   string
+		want bool
+	}{
+		{"88 04 47328 2", false},
+		{"978-8804473282", false},
+		{"0547928246", false},
+		{"978-0547928241", false},
+		{"978 0670013951", false},
+		{"089686281x", false},
+		{"9780822527602", false},
+		{"9780590d32053", false},
+		{"978-8891230195", false},
+		{"9780590132053F", false},
+		{"9780590732053", false},
+		{"081666303x", false},
+		{"", false},
+	}
+	for _, c := range cases0 {
+		_, err := ParseISBN(c.in)
+		if err != nil && c.want {
+			t.Errorf("ParseISBN(%q) == fail, want success (%q)", c.in, err)
+		} else if err == nil && !c.want {
+			t.Errorf("ParseISBN(%q) == success, want fail", c.in)
+		}
+	}
+
 	// Ensure that the range data is loaded
 	if !HasRangeData() {
 		xml_file := os.Getenv("ISBN_RANGE_FILE")
@@ -29,8 +57,39 @@ func TestISBN(t *testing.T) {
 		}
 	}
 
+	// Test the ISBN CalcCheckDigit
+	cases1 := []struct {
+		in   string
+		want string
+	}{
+		{"88 04 47328 2", "2"},
+		{"978-8804473282", "2"},
+		{"0547928246", "6"},
+		{"978-0547928241", "1"},
+		{"978 0670013951", "1"},
+		{"089686281x", "X"},
+		{"9780822527602", "2"},
+		{"97805S0132053", ""},
+		{"978-8891230195", "5"},
+		{"978-059013205F", ""},
+		{"9780590132053F", ""},
+		{"9780590732053", "5"},
+		{"081666303x", "3"},
+		{"", ""},
+	}
+	for _, c := range cases1 {
+		got, err := CalcCheckDigit(c.in)
+		if c.want != got {
+			if err != nil {
+				t.Errorf("CalcCheckDigit(%q) == '%s', want '%s' (%q)", c.in, got, c.want, err)
+			} else {
+				t.Errorf("CalcCheckDigit(%q) == '%s', want '%s'", c.in, got, c.want)
+			}
+		}
+	}
+
 	// Test the ISBN parsing/validation
-	cases := []struct {
+	cases2 := []struct {
 		in   string
 		want bool
 	}{
@@ -41,14 +100,14 @@ func TestISBN(t *testing.T) {
 		{"978 0670013951", true},
 		{"089686281x", true},
 		{"9780822527602", true},
-		{"9780590132053", true},
+		{"9780590d32053", false},
 		{"978-8891230195", true},
 		{"9780590132053F", false},
 		{"9780590732053", false},
 		{"081666303x", false},
 		{"", false},
 	}
-	for _, c := range cases {
+	for _, c := range cases2 {
 		_, err := ParseISBN(c.in)
 		if err != nil && c.want {
 			t.Errorf("ParseISBN(%q) == fail, want success (%q)", c.in, err)
@@ -58,7 +117,7 @@ func TestISBN(t *testing.T) {
 	}
 
 	// Test the ISBN Stringer interface
-	pcases := []struct {
+	cases3 := []struct {
 		in   string
 		want string
 	}{
@@ -74,19 +133,20 @@ func TestISBN(t *testing.T) {
 		{"9780590132053F", ""},
 		{"9780590732053", ""},
 		{"081666303x", ""},
+		{"0816bad66303x", ""},
 		{"", ""},
 	}
-	for _, p := range pcases {
+	for _, c := range cases3 {
 
-		isbn, _ := ParseISBN(p.in)
+		isbn, _ := ParseISBN(c.in)
 		got := fmt.Sprint(isbn)
-		if got != p.want {
-			t.Errorf("Print() == %q, want %q", got, p.want)
+		if got != c.want {
+			t.Errorf("Print() == %q, want %q", got, c.want)
 		}
 	}
 
 	// Test the ISBN10 and ISBN13 conversion functionality
-	cases2 := []struct {
+	cases4 := []struct {
 		in     string
 		want13 string
 		want10 string
@@ -105,7 +165,7 @@ func TestISBN(t *testing.T) {
 		{"081666303x", "", ""},
 		{"", "", ""},
 	}
-	for _, c := range cases2 {
+	for _, c := range cases4 {
 		isbn, _ := ParseISBN(c.in)
 
 		got13 := isbn.ISBN13()
