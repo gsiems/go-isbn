@@ -119,10 +119,8 @@ func CalcCheckDigit(isbn string) (string, error) {
 
 	if len(isbn) == 10 {
 		return CalcCheckDigit10(isbn)
-	} else if len(isbn) == 13 {
-		return CalcCheckDigit13(isbn)
 	}
-	return "", errors.New("Unable to calculate check digit, ISBN is wrong length.")
+	return CalcCheckDigit13(isbn)
 }
 
 // CalcCheckDigit10 calculates the check digit for an ISBN-10.
