@@ -104,9 +104,9 @@ func UnloadRangeData() (bool, error) {
 	rmd = make(rangeData)
 
 	// Yeah, yeah. Like this is going to break in it's current form.
-	// Mostly here bor the sake of consistent interface and in case
+	// Mostly here for the sake of consistent interface and in case
 	// UnloadRangeData ever needs to do anything more complex that
-	// could break (won't need to rebuild anything using this pkg)
+	// could break (won't need to re-code anything using this pkg)
 	if len(rmd) > 0 {
 		return false, errors.New("Range data did not unload.")
 	}
