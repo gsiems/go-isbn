@@ -11,9 +11,9 @@ import (
 
 func TestLoadRangeData(t *testing.T) {
 
-	xml_file := os.Getenv("ISBN_RANGE_FILE")
+	xmlFile := os.Getenv("ISBN_RANGE_FILE")
 	// "$HOME/Downloads/RangeMessage.xml"
-	if xml_file == "" {
+	if xmlFile == "" {
 		t.Errorf("ISBN_RANGE_FILE Env variable not set")
 	}
 
@@ -26,22 +26,22 @@ func TestLoadRangeData(t *testing.T) {
 
 	// Try loading the range data
 	want = true
-	got, err := LoadRangeData(xml_file)
+	got, err := LoadRangeData(xmlFile)
 	if err != nil {
-		t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xml_file, got, want, err)
+		t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xmlFile, got, want, err)
 	} else if got != want {
-		t.Errorf("LoadRangeData(%q) == %t, want %t", xml_file, got, want)
+		t.Errorf("LoadRangeData(%q) == %t, want %t", xmlFile, got, want)
 	}
 
 	// TODO: do we want/need to check the size of the range dataset?
 
 	// Now re-load the range data
 	want = true
-	got, err = LoadRangeData(xml_file)
+	got, err = LoadRangeData(xmlFile)
 	if err != nil {
-		t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xml_file, got, want, err)
+		t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xmlFile, got, want, err)
 	} else if got != want {
-		t.Errorf("LoadRangeData(%q) == %t, want %t", xml_file, got, want)
+		t.Errorf("LoadRangeData(%q) == %t, want %t", xmlFile, got, want)
 	}
 
 	// After loading, the HasRangeData should return true
