@@ -18,6 +18,8 @@ import (
 	"strings"
 )
 
+const p978 = "978"
+
 // An ISBN contains the elements of a parsed ISBN. The elements
 // consisting of:
 //  [EAN.UCC prefix]-
@@ -40,14 +42,14 @@ type ISBN struct {
 // ISBN to parse may, or may not, have spaces and/or hyphens we ensure
 // that ther are none in order to simplify the parsing.
 func stripISBN(isbn string) string {
-	r, _ := regexp.Compile("[\\s-]")
+	r, _ := regexp.Compile(`[\s-]`)
 	return r.ReplaceAllString(strings.ToUpper(isbn), "")
 }
 
 // chkLength checks that the length of the ISBN is correct
 func chkLength(isbn string) (bool, error) {
 	if len(isbn) != 10 && len(isbn) != 13 {
-		return false, errors.New("ISBN length is incorrect.")
+		return false, errors.New("ISBN length is incorrect")
 	}
 	return true, nil
 }
@@ -62,7 +64,7 @@ func chkCharacters(isbn string) (bool, error) {
 	if err != nil {
 		return false, err
 	} else if matched {
-		return false, errors.New("Invalid character found in ISBN.")
+		return false, errors.New("Invalid character found in ISBN")
 	}
 
 	b = []byte(checkDigit)
@@ -70,7 +72,7 @@ func chkCharacters(isbn string) (bool, error) {
 	if err != nil {
 		return false, err
 	} else if matched {
-		return false, errors.New("Invalid character found in check digit.")
+		return false, errors.New("invalid character found in check digit")
 	}
 
 	return true, nil
@@ -96,7 +98,7 @@ func chkCheckDigit(isbn string) (bool, error) {
 	if err != nil {
 		return false, err
 	} else if testDigit != checkDigit {
-		return false, errors.New("ISBN check digit is incorrect.")
+		return false, errors.New("ISBN check digit is incorrect")
 	}
 
 	return true, nil
@@ -128,7 +130,7 @@ func CalcCheckDigit10(isbn string) (string, error) {
 
 	var cd string
 
-	var sum int32 = 0
+	var sum int32
 	var i int32
 	for i = 0; i < 9; i++ {
 		v1, err := strconv.Atoi(string(isbn[i]))
@@ -147,11 +149,11 @@ func CalcCheckDigit10(isbn string) (string, error) {
 	return cd, nil
 }
 
-// CalcCheckDigit10 calculates the check digit for an ISBN-13.
+// CalcCheckDigit13 calculates the check digit for an ISBN-13.
 func CalcCheckDigit13(isbn string) (string, error) {
 
 	var cd string
-	var sum int32 = 0
+	var sum int32
 	var i int32
 	for i = 0; i < 12; i += 2 {
 		v1, err := strconv.Atoi(string(isbn[i]))
@@ -171,8 +173,19 @@ func CalcCheckDigit13(isbn string) (string, error) {
 	return cd, nil
 }
 
+// ValidateCheckDigit test whether or not the check digit for an ISBN
+// matches the calculated check digit.
+func ValidateCheckDigit(isbn string) bool {
+	isbn = stripISBN(isbn)
+	provided := isbn[len(isbn)-1:]
+
+	calculated, _ := CalcCheckDigit(isbn)
+
+	return provided == calculated
+}
+
 // ParseISBN parses the supplied ISBN into its constituent elements and
-// checks the validity of the ISBN.
+// checks the validity of the elements.
 func ParseISBN(isbn string) (ISBN, error) {
 
 	var ret ISBN
@@ -200,7 +213,7 @@ func ParseISBN(isbn string) (ISBN, error) {
 	// be parsed and that the remainder of the validation can be
 	// performed.
 	if !HasRangeData() {
-		err = errors.New("No range data for parsing ISBNs (perhaps you did not LoadRangeData).")
+		err = errors.New("no range data for parsing ISBNs (perhaps you did not LoadRangeData)")
 		return ret, err
 	}
 
@@ -230,7 +243,7 @@ func ParseISBN(isbn string) (ISBN, error) {
 	//       1        | Check digit
 
 	if len(isbn) == 10 {
-		ret.Prefix = "978"
+		ret.Prefix = p978
 	}
 
 	rg := []byte(isbn[:len(isbn)-1])
@@ -286,7 +299,7 @@ func ParseISBN(isbn string) (ISBN, error) {
 
 		// calculate the check digit for ISBN-13
 		if ret.IsValid {
-			ret.CheckDigit13, _ = CalcCheckDigit13("978" + isbn)
+			ret.CheckDigit13, _ = CalcCheckDigit13(p978 + isbn)
 		}
 	} else if len(isbn) == 13 {
 		ret.CheckDigit13 = isbn[len(isbn)-1:]
@@ -294,7 +307,7 @@ func ParseISBN(isbn string) (ISBN, error) {
 		ret.IsValid = ret.CheckDigit13 == chk
 
 		// calculate the check digit for ISBN-10 if applicable
-		if ret.IsValid && ret.Prefix == "978" {
+		if ret.IsValid && ret.Prefix == p978 {
 			s := []string{ret.RegistrationGroup, ret.Registrant, ret.Publication, "X"}
 			ret.CheckDigit10, _ = CalcCheckDigit10(strings.Join(s, ""))
 		}
@@ -314,7 +327,7 @@ func (x ISBN) ISBN13() string {
 
 // ISBN10 returns the ISBN as an ISBN-10 (as applicable).
 func (x ISBN) ISBN10() string {
-	if x.Prefix == "978" {
+	if x.Prefix == p978 {
 		s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
 		return strings.Join(s10, "")
 	}
@@ -327,7 +340,7 @@ func (x ISBN) String() string {
 		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
 		out := strings.Join(s13, "-")
 
-		if x.Prefix == "978" {
+		if x.Prefix == p978 {
 			s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
 			out = out + " (" + strings.Join(s10, "-") + ")"
 		}
