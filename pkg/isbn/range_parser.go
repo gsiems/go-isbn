@@ -90,10 +90,7 @@ var rmd = make(rangeData)
 // HasRangeData is used for indicating whether or not the range data
 // has been loaded.
 func HasRangeData() bool {
-	if len(rmd) > 0 {
-		return true
-	}
-	return false
+	return len(rmd) > 0
 }
 
 // UnloadRangeData unloads any loaded RangeMessage.xml file data.
@@ -108,7 +105,7 @@ func UnloadRangeData() (bool, error) {
 	// UnloadRangeData ever needs to do anything more complex that
 	// could break (won't need to re-code anything using this pkg)
 	if len(rmd) > 0 {
-		return false, errors.New("Range data did not unload.")
+		return false, errors.New("range data did not unload")
 	}
 	return true, nil
 }
@@ -126,7 +123,11 @@ func LoadRangeData(filename string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	dec := xml.NewDecoder(f)
 	var doc rangeMessageXML
