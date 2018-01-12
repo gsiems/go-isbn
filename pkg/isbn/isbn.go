@@ -2,7 +2,8 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-// Package isbn validates, parses, and converts International Standard Book Number (ISBN) data.
+// Package isbn validates, parses, and converts International Standard
+// Book Number (ISBN) data.
 //
 // In addition to simply checking the length, characters and check-digit
 // of an ISBN this also parses the ISBN using the ISBN ranges data
@@ -47,42 +48,42 @@ func stripISBN(isbn string) string {
 }
 
 // chkLength checks that the length of the ISBN is correct
-func chkLength(isbn string) (bool, error) {
+func chkLength(isbn string) error {
 	if len(isbn) != 10 && len(isbn) != 13 {
-		return false, errors.New("ISBN length is incorrect")
+		return errors.New("ISBN length is incorrect")
 	}
-	return true, nil
+	return nil
 }
 
 // chkCharacters checks that the characters in the ISBN are all valid.
-func chkCharacters(isbn string) (bool, error) {
+func chkCharacters(isbn string) error {
 	mainDigits := isbn[:len(isbn)-1]
 	checkDigit := isbn[len(isbn)-1:]
 
 	b := []byte(mainDigits)
 	matched, err := regexp.Match("[^0-9]", b)
 	if err != nil {
-		return false, err
+		return err
 	} else if matched {
-		return false, errors.New("Invalid character found in ISBN")
+		return errors.New("Invalid character found in ISBN")
 	}
 
 	b = []byte(checkDigit)
 	matched, err = regexp.Match("[^0-9X]", b)
 	if err != nil {
-		return false, err
+		return err
 	} else if matched {
-		return false, errors.New("invalid character found in check digit")
+		return errors.New("invalid character found in check digit")
 	}
 
-	return true, nil
+	return nil
 }
 
 // chkCheckDigit checks that the check digit for the ISBN is correct.
 func chkCheckDigit(isbn string) (bool, error) {
 	checkDigit := isbn[len(isbn)-1:]
 
-	_, err := chkLength(isbn)
+	err := chkLength(isbn)
 	if err != nil {
 		return false, err
 	}
@@ -109,12 +110,12 @@ func CalcCheckDigit(isbn string) (string, error) {
 
 	isbn = stripISBN(isbn)
 
-	_, err := chkLength(isbn)
+	err := chkLength(isbn)
 	if err != nil {
 		return "", err
 	}
 
-	_, err = chkCharacters(isbn)
+	err = chkCharacters(isbn)
 	if err != nil {
 		return "", err
 	}
@@ -194,12 +195,12 @@ func ParseISBN(isbn string) (ISBN, error) {
 
 	// Ensure that the basic format (length, characters) of the ISBN
 	// match the specification.
-	_, err := chkLength(isbn)
+	err := chkLength(isbn)
 	if err != nil {
 		return ret, err
 	}
 
-	_, err = chkCharacters(isbn)
+	err = chkCharacters(isbn)
 	if err != nil {
 		return ret, err
 	}
@@ -319,8 +320,13 @@ func ParseISBN(isbn string) (ISBN, error) {
 // ISBN13 returns the ISBN as an ISBN-13.
 func (x ISBN) ISBN13() string {
 	if x.IsValid {
-		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
-		return strings.Join(s13, "")
+		return strings.Join([]string{
+			x.Prefix,
+			x.RegistrationGroup,
+			x.Registrant,
+			x.Publication,
+			x.CheckDigit13},
+			"")
 	}
 	return ""
 }
@@ -328,8 +334,12 @@ func (x ISBN) ISBN13() string {
 // ISBN10 returns the ISBN as an ISBN-10 (as applicable).
 func (x ISBN) ISBN10() string {
 	if x.Prefix == p978 {
-		s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
-		return strings.Join(s10, "")
+		return strings.Join([]string{
+			x.RegistrationGroup,
+			x.Registrant,
+			x.Publication,
+			x.CheckDigit10},
+			"")
 	}
 	return ""
 }
@@ -337,12 +347,21 @@ func (x ISBN) ISBN10() string {
 // String implements the Stringer interface. Format currently subject to change.
 func (x ISBN) String() string {
 	if x.IsValid {
-		s13 := []string{x.Prefix, x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit13}
-		out := strings.Join(s13, "-")
+		out := strings.Join([]string{
+			x.Prefix,
+			x.RegistrationGroup,
+			x.Registrant,
+			x.Publication,
+			x.CheckDigit13},
+			"-")
 
 		if x.Prefix == p978 {
-			s10 := []string{x.RegistrationGroup, x.Registrant, x.Publication, x.CheckDigit10}
-			out = out + " (" + strings.Join(s10, "-") + ")"
+			out = out + " (" + strings.Join([]string{
+				x.RegistrationGroup,
+				x.Registrant,
+				x.Publication,
+				x.CheckDigit10},
+				"-") + ")"
 		}
 		return out
 	}
