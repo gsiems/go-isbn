@@ -42,18 +42,18 @@ func TestISBN(t *testing.T) {
 
 	// Ensure that the range data is loaded
 	if !HasRangeData() {
-		xml_file := os.Getenv("ISBN_RANGE_FILE")
+		xmlFile := os.Getenv("ISBN_RANGE_FILE")
 		// "$HOME/Downloads/RangeMessage.xml"
-		if xml_file == "" {
+		if xmlFile == "" {
 			t.Errorf("ISBN_RANGE_FILE Env variable not set")
 		}
 
 		want := true
-		got, err := LoadRangeData(xml_file)
+		got, err := LoadRangeData(xmlFile)
 		if err != nil {
-			t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xml_file, got, want, err)
+			t.Errorf("LoadRangeData(%q) == %t, want %t (%q)", xmlFile, got, want, err)
 		} else if got != want {
-			t.Errorf("LoadRangeData(%q) == %t, want %t", xml_file, got, want)
+			t.Errorf("LoadRangeData(%q) == %t, want %t", xmlFile, got, want)
 		}
 	}
 
