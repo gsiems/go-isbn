@@ -273,7 +273,7 @@ func ParseISBN(isbn string) (ISBN, error) {
 			}
 		} else if ret.Registrant == "" {
 			reg = append(reg, digit)
-			chk, err := strconv.Atoi(string(reg[:]))
+			chk, err := toInt(reg[:])
 			if err != nil {
 				return ret, err
 			}
@@ -366,4 +366,35 @@ func (x ISBN) String() string {
 		return out
 	}
 	return ""
+}
+
+// toInt converts a byte array of digits to its corresponding integer
+// value
+func toInt(b []byte) (ret int, err error) {
+	ret, err = strconv.Atoi(string(b))
+	if err != nil {
+
+		var digits = map[string]int{
+			"0": 0,
+			"1": 1,
+			"2": 2,
+			"3": 3,
+			"4": 4,
+			"5": 5,
+			"6": 6,
+			"7": 7,
+			"8": 8,
+			"9": 9,
+		}
+
+		ret = 0
+		for i := range b {
+			x, ok := digits[string(b[i])]
+			if !ok {
+				return 0, errors.New("toInt(): Not an integer")
+			}
+			ret = (10 * ret) + x
+		}
+	}
+	return ret, nil
 }

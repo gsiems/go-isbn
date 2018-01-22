@@ -9,7 +9,6 @@ import (
 	"errors"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -151,7 +150,7 @@ func LoadRangeData(filename string) (bool, error) {
 		reg.Agency = rg.Agency.Text
 
 		for _, rule := range rg.Rules.Rule {
-			rLen, err := strconv.Atoi(rule.Length.Text)
+			rLen, err := toInt([]byte(rule.Length.Text))
 			if err != nil {
 				log.Println(err)
 				continue
@@ -160,12 +159,12 @@ func LoadRangeData(filename string) (bool, error) {
 			if rLen > 0 {
 
 				tokens := strings.Split(rule.Range.Text, "-")
-				rStart, err := strconv.Atoi(tokens[0][:rLen])
+				rStart, err := toInt([]byte(tokens[0][:rLen]))
 				if err != nil {
 					log.Println(err)
 					continue
 				}
-				rEnd, err := strconv.Atoi(tokens[1][:rLen])
+				rEnd, err := toInt([]byte(tokens[1][:rLen]))
 				if err != nil {
 					log.Println(err)
 					continue
