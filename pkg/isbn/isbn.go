@@ -81,13 +81,13 @@ func chkCharacters(isbn string) error {
 
 // chkCheckDigit checks that the check digit for the ISBN is correct.
 func chkCheckDigit(isbn string) (bool, error) {
-	checkDigit := isbn[len(isbn)-1:]
 
 	err := chkLength(isbn)
 	if err != nil {
 		return false, err
 	}
 
+	checkDigit := isbn[len(isbn)-1:]
 	var testDigit string
 
 	if len(isbn) == 10 {
@@ -177,7 +177,13 @@ func CalcCheckDigit13(isbn string) (string, error) {
 // ValidateCheckDigit test whether or not the check digit for an ISBN
 // matches the calculated check digit.
 func ValidateCheckDigit(isbn string) bool {
+
 	isbn = stripISBN(isbn)
+	err := chkLength(isbn)
+	if err != nil {
+		return false
+	}
+
 	provided := isbn[len(isbn)-1:]
 
 	calculated, _ := CalcCheckDigit(isbn)
