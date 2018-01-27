@@ -213,7 +213,7 @@ func TestISBN06validatechk(t *testing.T) {
 	for _, c := range cases {
 		chk := ValidateCheckDigit(c.in)
 		if chk != c.want {
-			t.Errorf("ValidateCheckDigit(%q) == %s, want %s", c.in, chk, c.want)
+			t.Errorf("ValidateCheckDigit(%q) == %t, want %t", c.in, chk, c.want)
 		}
 	}
 
