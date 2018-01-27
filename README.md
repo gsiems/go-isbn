@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/gsiems/go-isbn/pkg/isbn?status.svg)](https://godoc.org/github.com/gsiems/go-isbn/pkg/isbn)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gsiems/go-isbn)](https://goreportcard.com/report/github.com/gsiems/go-isbn)
 
-[![ISBN](isbn.png)]
+![ISBN](isbn.png)
 
 Validate, parse, and convert International Standard Book Number (ISBN) data.
 
