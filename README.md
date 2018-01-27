@@ -1,5 +1,10 @@
 # go-isbn
 
+[![GoDoc](https://godoc.org/github.com/gsiems/go-isbn/pkg/isbn?status.svg)]
+(https://godoc.org/github.com/gsiems/go-isbn/pkg/isbn)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gsiems/go-isbn)]
+(https://goreportcard.com/report/github.com/gsiems/go-isbn)
+
 Validate, parse, and convert International Standard Book Number (ISBN) data.
 
 In addition to simply checking the length, characters and check-digit
