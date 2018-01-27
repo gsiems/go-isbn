@@ -1,3 +1,4 @@
 *.html
 *.out
 pkg/isbn/RangeMessage.xml
+cmd/chk-isbn
