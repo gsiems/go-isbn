@@ -10,10 +10,10 @@ import (
 	"testing"
 )
 
-func TestISBN(t *testing.T) {
+func TestISBN01norange(t *testing.T) {
 
 	// Test the ISBN parsing/validation without range data
-	cases0 := []struct {
+	cases := []struct {
 		in   string
 		want bool
 	}{
@@ -31,7 +31,7 @@ func TestISBN(t *testing.T) {
 		{"081666303x", false},
 		{"", false},
 	}
-	for _, c := range cases0 {
+	for _, c := range cases {
 		_, err := ParseISBN(c.in)
 		if err != nil && c.want {
 			t.Errorf("ParseISBN(%q) == fail, want success (%q)", c.in, err)
@@ -39,11 +39,13 @@ func TestISBN(t *testing.T) {
 			t.Errorf("ParseISBN(%q) == success, want fail", c.in)
 		}
 	}
+}
+
+func TestISBN02loadrangedata(t *testing.T) {
 
 	// Ensure that the range data is loaded
 	if !HasRangeData() {
 		xmlFile := os.Getenv("ISBN_RANGE_FILE")
-		// "$HOME/Downloads/RangeMessage.xml"
 		if xmlFile == "" {
 			t.Errorf("ISBN_RANGE_FILE Env variable not set")
 		}
@@ -57,8 +59,19 @@ func TestISBN(t *testing.T) {
 		}
 	}
 
+	_, _ = UnloadRangeData()
+}
+
+func TestISBN03checkdigit(t *testing.T) {
+
+	// Ensure that the range data is loaded
+	ps := prepRangeData()
+	if !ps {
+		t.Errorf("prepRangeData failed")
+	}
+
 	// Test the ISBN CalcCheckDigit
-	cases1 := []struct {
+	cases := []struct {
 		in   string
 		want string
 	}{
@@ -77,7 +90,7 @@ func TestISBN(t *testing.T) {
 		{"081666303x", "3"},
 		{"", ""},
 	}
-	for _, c := range cases1 {
+	for _, c := range cases {
 		got, err := CalcCheckDigit(c.in)
 		if c.want != got {
 			if err != nil {
@@ -88,8 +101,19 @@ func TestISBN(t *testing.T) {
 		}
 	}
 
+	_, _ = UnloadRangeData()
+}
+
+func TestISBN04parse(t *testing.T) {
+
+	// Ensure that the range data is loaded
+	ps := prepRangeData()
+	if !ps {
+		t.Errorf("prepRangeData failed")
+	}
+
 	// Test the ISBN parsing/validation
-	cases2 := []struct {
+	cases := []struct {
 		in   string
 		want bool
 	}{
@@ -107,7 +131,7 @@ func TestISBN(t *testing.T) {
 		{"081666303x", false},
 		{"", false},
 	}
-	for _, c := range cases2 {
+	for _, c := range cases {
 		_, err := ParseISBN(c.in)
 		if err != nil && c.want {
 			t.Errorf("ParseISBN(%q) == fail, want success (%q)", c.in, err)
@@ -116,8 +140,19 @@ func TestISBN(t *testing.T) {
 		}
 	}
 
+	_, _ = UnloadRangeData()
+}
+
+func TestISBN05stringer(t *testing.T) {
+
+	// Ensure that the range data is loaded
+	ps := prepRangeData()
+	if !ps {
+		t.Errorf("prepRangeData failed")
+	}
+
 	// Test the ISBN Stringer interface
-	cases3 := []struct {
+	cases := []struct {
 		in   string
 		want string
 	}{
@@ -136,7 +171,7 @@ func TestISBN(t *testing.T) {
 		{"0816bad66303x", ""},
 		{"", ""},
 	}
-	for _, c := range cases3 {
+	for _, c := range cases {
 
 		isbn, _ := ParseISBN(c.in)
 		got := fmt.Sprint(isbn)
@@ -145,8 +180,57 @@ func TestISBN(t *testing.T) {
 		}
 	}
 
+	_, _ = UnloadRangeData()
+}
+
+func TestISBN06validatechk(t *testing.T) {
+
+	// Ensure that the range data is loaded
+	ps := prepRangeData()
+	if !ps {
+		t.Errorf("prepRangeData failed")
+	}
+
+	// Test the ISBN check-digit validation
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"88 04 47328 2", true},
+		{"978-8804473282", true},
+		{"0547928246", true},
+		{"978-0547928241", true},
+		{"978 0670013951", true},
+		{"089686281x", true},
+		{"9780822527602", true},
+		{"9780590d32053", false},
+		{"978-8891230195", true},
+		{"9780590132053F", false},
+		{"9780590732053", false},
+		{"081666303x", false},
+		{"", false},
+	}
+	for _, c := range cases {
+		chk := ValidateCheckDigit(c.in)
+		if chk != c.want {
+			t.Errorf("ValidateCheckDigit(%q) == %s, want %s", c.in, chk, c.want)
+		}
+	}
+
+	_, _ = UnloadRangeData()
+
+}
+
+func TestISBN07conversion(t *testing.T) {
+
+	// Ensure that the range data is loaded
+	ps := prepRangeData()
+	if !ps {
+		t.Errorf("prepRangeData failed")
+	}
+
 	// Test the ISBN10 and ISBN13 conversion functionality
-	cases4 := []struct {
+	cases := []struct {
 		in     string
 		want13 string
 		want10 string
@@ -165,7 +249,7 @@ func TestISBN(t *testing.T) {
 		{"081666303x", "", ""},
 		{"", "", ""},
 	}
-	for _, c := range cases4 {
+	for _, c := range cases {
 		isbn, _ := ParseISBN(c.in)
 
 		got13 := isbn.ISBN13()
@@ -180,4 +264,23 @@ func TestISBN(t *testing.T) {
 	}
 
 	_, _ = UnloadRangeData()
+}
+
+func prepRangeData() bool {
+
+	// Ensure that the range data is loaded
+	if !HasRangeData() {
+		xmlFile := os.Getenv("ISBN_RANGE_FILE")
+		if xmlFile == "" {
+			return false
+		}
+		want := true
+		got, err := LoadRangeData(xmlFile)
+		if err != nil {
+			return false
+		} else if got != want {
+			return false
+		}
+	}
+	return true
 }
