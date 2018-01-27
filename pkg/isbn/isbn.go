@@ -41,7 +41,7 @@ type ISBN struct {
 
 // stripISBN removes all spaces and hypens from an ISBN. Since the
 // ISBN to parse may, or may not, have spaces and/or hyphens we ensure
-// that ther are none in order to simplify the parsing.
+// that there are none in order to simplify the parsing.
 func stripISBN(isbn string) string {
 	r, _ := regexp.Compile(`[\s-]`)
 	return r.ReplaceAllString(strings.ToUpper(isbn), "")
