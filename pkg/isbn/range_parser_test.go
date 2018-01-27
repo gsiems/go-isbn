@@ -12,7 +12,6 @@ import (
 func TestLoadRangeData(t *testing.T) {
 
 	xmlFile := os.Getenv("ISBN_RANGE_FILE")
-	// "$HOME/Downloads/RangeMessage.xml"
 	if xmlFile == "" {
 		t.Errorf("ISBN_RANGE_FILE Env variable not set")
 	}
