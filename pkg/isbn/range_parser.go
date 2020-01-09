@@ -130,7 +130,7 @@ func LoadRangeData(filename string) (bool, error) {
 
 	dec := xml.NewDecoder(f)
 	var doc rangeMessageXML
-	if err := dec.Decode(&doc); err != nil {
+	if err = dec.Decode(&doc); err != nil {
 		return false, err
 	}
 
