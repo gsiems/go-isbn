@@ -1,3 +1,3 @@
 module github.com/gsiems/go-isbn
 
-go 1.13
+go 1.20
