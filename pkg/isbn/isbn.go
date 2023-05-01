@@ -23,11 +23,12 @@ const p978 = "978"
 
 // An ISBN contains the elements of a parsed ISBN. The elements
 // consisting of:
-//  [EAN.UCC prefix]-
-//  [Registration Group element]-
-//  [Registrant element]-
-//  [Publication element]-
-//  [Check-digit]
+//
+//	[EAN.UCC prefix]-
+//	[Registration Group element]-
+//	[Registrant element]-
+//	[Publication element]-
+//	[Check-digit]
 type ISBN struct {
 	Prefix            string
 	RegistrationGroup string
